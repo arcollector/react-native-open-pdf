@@ -1,0 +1,55 @@
+// based on https://github.com/react-native-device-info/react-native-device-info/blob/master/android/build.gradle
+buildscript {
+    // The Android Gradle plugin is only required when opening the android folder stand-alone.
+    // This avoids unnecessary downloads and potential conflicts when the library is included as a
+    // module dependency in an application project.
+    if (project == rootProject) {
+        repositories {
+            google()
+            jcenter()
+        }
+        def buildGradleVersion = ext.has('buildGradlePluginVersion') ? ext.get('buildGradlePluginVersion') : '3.5.3'
+
+        dependencies {
+            classpath "com.android.tools.build:gradle:$buildGradleVersion"
+        }
+    }
+}
+
+apply plugin: 'com.android.library'
+
+def safeExtGet(prop, fallback) {
+    rootProject.ext.has(prop) ? rootProject.ext.get(prop) : fallback
+}
+
+android {
+    compileSdkVersion safeExtGet('compileSdkVersion', 30)
+
+    defaultConfig {
+        minSdkVersion safeExtGet('minSdkVersion', 16)
+        targetSdkVersion safeExtGet('targetSdkVersion', 28)
+
+        versionCode 1
+        versionName "1.0"
+    }
+    lintOptions {
+        abortOnError false
+    }
+}
+
+repositories {
+    google()
+    maven {
+        // All of React Native (JS, Obj-C sources, Android binaries) is installed from npm
+        url "$rootDir/../node_modules/react-native/android"
+    }
+    jcenter()
+}
+
+dependencies {
+    if (project == rootProject) {
+        implementation "com.walmartlabs.ern:react-native:0.60.6"
+    } else {
+        implementation "com.facebook.react:react-native:${safeExtGet('reactNativeVersion', '+')}"
+    }
+}
